@@ -1,0 +1,36 @@
+
+body.dragging, body.dragging * {
+	cursor: move !important;
+}
+
+.dragged {
+	position: absolute;
+	opacity: 0.5;
+	z-index: 2000;
+}
+
+ol.sortable {
+	list-style: none;
+	margin-left: 0;
+}
+
+ol.sortable li label {
+	cursor: grab;
+}
+
+ol.sortable li.placeholder {
+	position: relative;
+}
+
+ol.sortable li.placeholder:before {
+	position: absolute;
+
+	content: "";
+	width: 0;
+	height: 0;
+	margin-left: -5px;
+	top: -6px;
+	border-top: 6px solid transparent;
+	border-bottom: 6px solid transparent;
+	border-left: 6px solid darkred;
+}
