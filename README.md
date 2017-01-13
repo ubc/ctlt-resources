@@ -4,6 +4,7 @@ This plugin allows you to tag any arbitrary post type as a "Resource"
 All resources are listed in a common archive, and are fully searchable.
 
 **Attributes**
+
 In the plugin settings you can configure a set of fields called "Resource Attributes"
 
 Each resource can define these attributes, and have these attributes appear in search forms.
@@ -11,11 +12,13 @@ Each resource can define these attributes, and have these attributes appear in s
 For example, if your resources are all Videos, you might want to have an attribute like "Video Length" or "Source Website" (where the options are YouTube, Vimeo, etc)
 
 **Custom Post Type**
+
 By default many different kinds of post types can be defined as resources. Posts, pages, and media are all possible.
 
 However, if you want to keep your resource collection more centralized and straightforward, you can enable a custom "Resource" post type. With all the regular functionality of resources, and a simple text descriptions.
 
 **Shortcodes**
+
 Each resource has the option to embed a list of it's attributes, and a list of related resources at the bottom of the content. However, if you want to customize the location of these elements, or if you want to embed lists and attributes on other pages you can use the following two shortcodes.
 
 `[cres_attributes]`
