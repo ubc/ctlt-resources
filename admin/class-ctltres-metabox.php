@@ -89,6 +89,17 @@ class CTLTRES_Metabox {
 
 		// TODO: Check if there are no taxonomy terms, and if so direct the user to create some.
 
+		// If there are no taxonomy terms defined display a warning.
+		if ( count( get_terms( CTLTRES_Resources::$taxonomy_slug ) ) ) {
+			$taxonomy_url = admin_url( 'edit-tags.php?taxonomy=' . CTLTRES_Resources::$taxonomy_slug );
+			?>
+			<p>
+				You must <a href="<?php echo $taxonomy_url; ?>">create a Resource category</a> before you can create a valid resource.
+			</p>
+			<?php
+			return;
+		}
+
 		// Create options to display a dropdown menu with all the possible categories
 		$dropdown_options = array(
 			'taxonomy'         => CTLTRES_Resources::$taxonomy_slug,
@@ -112,21 +123,23 @@ class CTLTRES_Metabox {
 		$visibility = empty( $category ) ? 'style="display:none;"' : '';
 
 		?>
-		<p id="ctltres_metabox_embed_options" <?php echo $visibility; ?>>
-			<?php
-			// Display the embed options
-			$embed_options = CTLTRES_Resources::get_embed_options();
+		<section id="ctltres_metabox_embed_options" <?php echo $visibility; ?>>
+			<p>
+				<?php
+				// Display the embed options
+				$embed_options = CTLTRES_Resources::get_embed_options();
 
-			self::render_embed_options_checkbox( 'show_attributes', $embed_options, "Show resource attributes table" );
-			self::render_embed_options_checkbox( 'show_list', $embed_options, "Show list of similar resources" );
-			self::render_embed_options_checkbox( 'show_search', $embed_options, "Show search form with resource list" );
-			?>
-			<em>
-				The above content can also be embedded using the [cres_attributes] and [cres_list] shortcodes.
-			</em>
-		</p>
+				self::render_embed_options_checkbox( 'show_attributes', $embed_options, "Show resource attributes table" );
+				self::render_embed_options_checkbox( 'show_list', $embed_options, "Show list of similar resources" );
+				self::render_embed_options_checkbox( 'show_search', $embed_options, "Show search form with resource list" );
+				?>
+				<em>
+					The above content can also be embedded using the [cres_attributes] and [cres_list] shortcodes.
+				</em>
+			</p>
+		</section>
 
-		<p id="ctltres_metabox_attributes" <?php echo $visibility; ?>>
+		<section id="ctltres_metabox_attributes" <?php echo $visibility; ?>>
 			<?php
 			// Display the resource attribute fields.
 			$data = CTLTRES_Resources::get_attributes();
@@ -136,7 +149,7 @@ class CTLTRES_Metabox {
 				self::render_attribute_field( $attribute, $value );
 			}
 			?>
-		</p>
+		</section>
 		<?php
 	}
 

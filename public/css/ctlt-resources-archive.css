@@ -1,0 +1,19 @@
+
+.post > * {
+	display: none;
+}
+
+/* Content */
+.post .post-entry,
+.post .entry-content,
+/* Title */
+.post .entry-title,
+.post .post-title,
+.post h1,
+.post h2 {
+	display: inherit;
+}
+
+#ctltres-archive-content ~ * {
+	display: none;
+}

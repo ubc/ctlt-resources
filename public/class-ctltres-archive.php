@@ -14,22 +14,37 @@ class CTLTRES_Archive {
 	 * @filter init
 	 */
 	public static function init() {
-		// Check if the plugin is currently being activated.
-		if ( CTLT_Resources::$is_being_activated ) {
-			// If so, add the rewrite rules, and flush them
-			global $wp;
-
-		    $wp->add_query_var('ctltres');
-			add_rewrite_rule( '^' . CTLTRES_Resources::$navigation_slug . '/?$', 'index.php?ctltres=all-categories', 'top' );
-			add_rewrite_rule( '^' . CTLTRES_Resources::$navigation_slug . '/([^/]+)/?$', 'index.php?ctltres=$matches[1]', 'top' );
-
-			global $wp_rewrite;
-			$wp_rewrite->flush_rules();
-		}
-
 		add_filter( 'query_vars', array( __CLASS__, 'filter_query_vars' ) );
 		add_action( 'parse_query', array( __CLASS__, 'parse_query' ) ) ;
 		add_filter( 'template_include', array( __CLASS__, 'filter_template' ) ) ;
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
+		self::add_rewrite_rules();
+	}
+
+	/**
+	 * @filter wp_enqueue_scripts
+	 */
+	public static function enqueue_styles() {
+		wp_register_style( 'ctltres-archive', CTLT_Resources::$directory_url . 'public/css/ctlt-resources-archive.css' );
+	}
+
+	/**
+	 * Adds the rewrite rules needed to make the archives render
+	 */
+	public static function add_rewrite_rules() {
+		// TODO: This can probably be done more efficiently. We don't need to flush on every load, do we?
+		global $wp;
+
+		$wp->add_query_var('ctltres');
+		add_rewrite_rule( '^' . CTLTRES_Resources::$navigation_slug . '/?$', 'index.php?ctltres=all-categories', 'top' );
+		add_rewrite_rule( '^' . CTLTRES_Resources::$navigation_slug . '/([^/]+)/?$', 'index.php?ctltres=$matches[1]', 'top' );
+
+		// Check if the plugin is currently being activated.
+		//if ( CTLT_Resources::$is_being_activated ) {
+			// If so flush the rewrite rules
+			global $wp_rewrite;
+			$wp_rewrite->flush_rules();
+		//}
 	}
 
 	/**
@@ -115,32 +130,29 @@ class CTLTRES_Archive {
 
 			ob_start();
 
-			// If the search form is enabled, render it.
-			if ( CTLTRES_Configuration::is_search_enabled() ) {
-				self::render_search_form( $args );
-			}
+			wp_enqueue_style( 'ctltres-archive' );
 
-			// If there is at least one filter, render a clear filters button.
-			if ( ! empty( $args['filters'] ) ) {
-				?>
-				<div class="ctltres-clear-filters">
-					<a href="<?php echo home_url( CTLTRES_Resources::$navigation_slug ); ?>" class="btn btn-primary button button-primary">Clear Filters</a>
-				</div>
-				<?php
-			}
-
-			// Render the resources
-			self::render_resource_list( $args );
-
-			// Then we add this styling to remove unwanted elements from the archive template.
 			?>
-			<style>
-				.post header,
-				.post footer,
-				.entry-header,
-				.entry-footer
-					{ display: none; }
-			</style>
+			<div id="ctltres-archive-content">
+				<?php
+					// If the search form is enabled, render it.
+					if ( CTLTRES_Configuration::is_search_enabled() ) {
+						self::render_search_form( $args );
+					}
+
+					// If there is at least one filter, render a clear filters button.
+					if ( ! empty( $args['filters'] ) ) {
+						?>
+						<div class="ctltres-clear-filters">
+							<a href="<?php echo home_url( CTLTRES_Resources::$navigation_slug ); ?>" class="btn btn-primary button button-primary">Clear Filters</a>
+						</div>
+						<?php
+					}
+
+					// Render the resources
+					self::render_resource_list( $args );
+				?>
+			</div>
 			<?php
 
 			$content = ob_get_clean();

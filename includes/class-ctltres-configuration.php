@@ -98,7 +98,7 @@ class CTLTRES_Configuration {
 	 */
 	public static function is_search_enabled() {
 		$value = get_option( self::$setting_enable_search, true, true );
-		return empty( $value ) ? true : $value;
+		return $value != false;
 	}
 
 	/**
