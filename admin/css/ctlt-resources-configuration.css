@@ -1,3 +1,7 @@
+/**
+ * This file defines styling for the resource settings menu.
+ * Specifically it styles the drag and drop interface for sortng fields.
+ */
 
 body.dragging, body.dragging * {
 	cursor: move !important;

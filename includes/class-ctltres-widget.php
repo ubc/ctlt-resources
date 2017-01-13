@@ -1,15 +1,21 @@
 <?php
 
+/**
+ * This class handles the custom resources widget.
+ * The widget displays a list of resources
+ */
 class CTLTRES_Widget extends WP_Widget {
 	
+	// A slug for the widget
 	private static $slug = 'ctltres_widget';
 
 	public static function init() {
+		// Register the widget
 		register_widget( __CLASS__ );
 	}
 
 	/**
-	 * Sets up the widgets name etc
+	 * Define the attributes for the widget
 	 */
 	public function __construct() {
 		parent::__construct( self::$slug, __( "Resources List", 'ctltres' ), array( 
@@ -19,10 +25,7 @@ class CTLTRES_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Outputs the content of the widget
-	 *
-	 * @param array $args
-	 * @param array $instance
+	 * Renders the content of the widget
 	 */
 	public function widget( $args, $instance ) {
 		echo $args['before_widget'];
@@ -33,19 +36,24 @@ class CTLTRES_Widget extends WP_Widget {
 			echo $args['after_title'];
 		}
 
+		// Define the filters for this widget.
+		// The widget options may have defined some filters, so those need to be parsed.
 		$arguments = array(
 			'show_attributes' => $instance['show_attributes'],
 			'filters' => CTLTRES_Resources::parse_filter_arguments( $instance ),
 		);
 		
+		// If search is enabled, render it.
 		if ( $instance['search'] ) {
 			CTLTRES_Archive::render_search_form( $arguments );
 		}
 
+		// If this widget is configured to show at least 1 resource, then render them.
 		if ( $instance['limit'] > 0 ) {
 			CTLTRES_Archive::render_resource_list( $arguments );
 		}
 
+		// Include a link to see the full list of resources.
 		$see_more_link = get_home_url( null, CTLTRES_Resources::$navigation_slug );
 		?>
 		<a class="ctltres-list-link" href="<?php echo $see_more_link; ?>">See all resources</a>
@@ -55,11 +63,10 @@ class CTLTRES_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Outputs the options form on admin
-	 *
-	 * @param array $instance The widget options
+	 * Renders the widget's options form on the admin page.
 	 */
 	public function form( $instance ) {
+		// Basic options
 		$this->text_field( 'Title', 'title', __( "Resources", 'ctltres' ), $instance );
 		$this->text_field( 'Limit', 'limit', 5, $instance, 'number' );
 		?>
@@ -69,8 +76,10 @@ class CTLTRES_Widget extends WP_Widget {
 			$this->check_field( 'Show Attributes', 'show_attributes', false, $instance );
 			?>
 		</p>
+
 		<strong>Filters</strong>
 		<?php
+		// Create the attribute filter options.
 		$attribute_fields = CTLTRES_Configuration::get_attribute_fields();
 
 		foreach ( CTLTRES_Configuration::get_searchable_fields() as $slug ) {
@@ -78,6 +87,8 @@ class CTLTRES_Widget extends WP_Widget {
 				$this->category_field( $instance );
 			} else if ( $slug == 'search' ) {
 				// Do nothing
+				// We do not allow a default text filter.
+				// TODO: Maybe we should?
 			} else {
 				$attribute_field = $attribute_fields[ $slug ];
 
@@ -98,6 +109,9 @@ class CTLTRES_Widget extends WP_Widget {
 		}
 	}
 
+	/**
+	 * Renders an admin field where you can select a resource category.
+	 */
 	private function category_field( $instance ) {
 		$title = "Category";
 		$slug = 'category';
@@ -125,6 +139,9 @@ class CTLTRES_Widget extends WP_Widget {
 		<?php
 	}
 
+	/**
+	 * Renders an admin field where you can input text.
+	 */
 	private function text_field( $title, $slug, $default, $instance, $type = 'text' ) {
 		$id = esc_attr( $this->get_field_id( $slug ) );
 		$name = esc_attr( $this->get_field_name( $slug ) );
@@ -138,6 +155,9 @@ class CTLTRES_Widget extends WP_Widget {
 		<?php
 	}
 
+	/**
+	 * Renders an admin field where you can select from a set of options
+	 */
 	private function select_field( $title, $slug, $options, $instance ) {
 		$id = esc_attr( $this->get_field_id( $slug ) );
 		$name = esc_attr( $this->get_field_name( $slug ) );
@@ -159,6 +179,9 @@ class CTLTRES_Widget extends WP_Widget {
 		<?php
 	}
 
+	/**
+	 * Renders an admin field where you can check a box.
+	 */
 	private function check_field( $title, $slug, $default_on, $instance ) {
 		$id = esc_attr( $this->get_field_id( $slug ) );
 		$name = esc_attr( $this->get_field_name( $slug ) );
@@ -178,12 +201,10 @@ class CTLTRES_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Processing widget options on save
-	 *
-	 * @param array $new_instance The new options
-	 * @param array $old_instance The previous options
+	 * Validate and save the widget options.
 	 */
 	public function update( $new_instance, $old_instance ) {
+		// Validate the basic options.
 		$result = array(
 			'title'           => empty( $new_instance['title'] ) ? '' : strip_tags( $new_instance['title'] ),
 			'search'          => isset( $new_instance['search'] ) && $new_instance['search'] == 'on',
@@ -191,6 +212,7 @@ class CTLTRES_Widget extends WP_Widget {
 			'limit'           => intval( $new_instance['limit'] ),
 		);
 
+		// Parse the attribute fields.
 		$result = array_merge( $result, CTLTRES_Resources::parse_filter_arguments( $new_instance ) );
 
 		return $result;
