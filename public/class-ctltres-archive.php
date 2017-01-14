@@ -90,12 +90,14 @@ class CTLTRES_Archive {
 
 			// Since this method is a bit hackish, we need to hook into two filters to make sure that Wordpress displays the intended content.
 			add_filter( 'the_content', array( __CLASS__, 'get_archive_content' ) );
+			add_filter( 'the_excerpt', array( __CLASS__, 'get_archive_content' ) );
 			add_filter( 'get_the_archive_title', array( __CLASS__, 'get_archive_title' ) );
 
 			// Change the query so it only renders one post. We will change that content of that singular post.
 			query_posts( array(
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
+				'posts_per_page'      => 1,
+				'no_found_rows'       => true,
+				'ignore_sticky_posts' => true,
 			) );
 
 			// Remove all pagination, we will do our own pagination.
