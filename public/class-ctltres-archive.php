@@ -85,8 +85,8 @@ class CTLTRES_Archive {
 	 */
 	public static function filter_template( $template ) {
 		if ( self::$is_archive ) {
-			// Let's make it use the archive template.
-			$template = locate_template( 'archive.php' );
+			// Let's make it use the single template.
+			$template = locate_template( 'single.php' );
 
 			// Since this method is a bit hackish, we need to hook into two filters to make sure that Wordpress displays the intended content.
 			add_filter( 'the_content', array( __CLASS__, 'get_archive_content' ) );
